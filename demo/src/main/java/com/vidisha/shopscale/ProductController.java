@@ -9,9 +9,8 @@ import java.util.Optional;
 @RequestMapping("/api/products")
 public class ProductController {
 
-    private List<Product> products = new ArrayList<>(); // Changed to ArrayList
+    private List<Product> products = new ArrayList<>();
 
-    // Initialize with sample data
     public ProductController() {
         products.add(new Product(1L, "MacBook Pro M3", 125000, "macbook.jpg"));
         products.add(new Product(2L, "iPhone 16 Pro", 85000, "iphone.jpg"));
@@ -19,20 +18,34 @@ public class ProductController {
     }
 
     @GetMapping
-    public List<Product> getProducts() {
-        return products;
-    }
+    public List<Product> getProducts() { return products; }
 
     @GetMapping("/{id}")
     public Optional<Product> getProductById(@PathVariable Long id) {
         return products.stream().filter(p -> p.getId().equals(id)).findFirst();
     }
 
-    // ← NEW! Create product
     @PostMapping
     public Product createProduct(@RequestBody Product product) {
-        product.setId((long) (products.size() + 1)); // Auto-generate ID
+        product.setId((long) (products.size() + 1));
         products.add(product);
         return product;
+    }
+
+    // ← NEW! Update product
+    @PutMapping("/{id}")
+    public Product updateProduct(@PathVariable Long id, @RequestBody Product updatedProduct) {
+        Optional<Product> existing = products.stream()
+                .filter(p -> p.getId().equals(id))
+                .findFirst();
+
+        if (existing.isPresent()) {
+            Product product = existing.get();
+            product.setName(updatedProduct.getName());
+            product.setPrice(updatedProduct.getPrice());
+            product.setImageUrl(updatedProduct.getImageUrl());
+            return product;
+        }
+        return null; // Or throw exception in production
     }
 }
