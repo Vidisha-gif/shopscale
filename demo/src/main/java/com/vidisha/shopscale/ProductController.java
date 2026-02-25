@@ -46,6 +46,17 @@ public class ProductController {
             product.setImageUrl(updatedProduct.getImageUrl());
             return product;
         }
+
         return null; // Or throw exception in production
     }
+    // ← NEW! Delete product (add after updateProduct method)
+    @DeleteMapping("/{id}")
+    public String deleteProduct(@PathVariable Long id) {
+        boolean removed = products.removeIf(p -> p.getId().equals(id));
+        if (removed) {
+            return "Product with id " + id + " deleted successfully";
+        }
+        return "Product not found";
+    }
+
 }
